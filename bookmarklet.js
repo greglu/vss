@@ -1,1 +1,1 @@
-javascript:(function(){var s=document.createElement('script');s.setAttribute('src', 'http://localhost:8000/vs-save.js');document.body.appendChild(s);}());
+javascript:(function(){var s=document.createElement('script');s.setAttribute('src', 'http://localhost:8000/vss.js');document.body.appendChild(s);}());
