@@ -1,6 +1,11 @@
 (function() {
   var SAVE_PREFIX = 'vss-' + $('#item_suitModel :selected').val() + '-';
-  var CONTAINER = $('#panel_options');
+
+  var CONTAINER = $('#content');
+
+  var CONTAINER_OPTIONS_SELECTOR = '#panel_options';
+  var CONTAINER_OPTIONS = $(CONTAINER_OPTIONS_SELECTOR);
+
   var BUTTON_STYLE = {
     // copied from verticalsuits.css
     "vertical-align": "top",
@@ -27,6 +32,9 @@
     if (!('localStorage' in window && window['localStorage'] !== null)) {
       return false;
     }
+    if (CONTAINER.length === 0 || CONTAINER_OPTIONS.length === 0) {
+      return false;
+    }
     return true;
   }
 
@@ -42,11 +50,20 @@
     return SAVE_PREFIX + getDesignName(name);
   }
 
-  function triggerContainerEvent(target) {
-    if (target) {
-      var triggerEvent = $.Event('change');
-      triggerEvent.target = (target.jquery ? target[0] : target);
-      CONTAINER.trigger(triggerEvent);
+  function triggerContainerEvent(incomingTarget) {
+    if (incomingTarget) {
+      var $target = $(incomingTarget);
+      var target = $target[0];
+
+      // We need to trigger both on the target, and on the
+      // container as a delegate listener
+      $target.triggerHandler('change');
+
+      if ($target.parents(CONTAINER_OPTIONS_SELECTOR)) {
+        var triggerEvent = $.Event('change');
+        triggerEvent.target = target;
+        CONTAINER_OPTIONS.trigger(triggerEvent);
+      }
     }
   }
 
@@ -82,12 +99,12 @@
     return JSON.stringify(state);
   }
 
-  function restoreState(serializedState) {
-    if (!serializedState) {
+  function restoreState(state, isParsed) {
+    if (!state) {
       return;
     }
 
-    var state = JSON.parse(serializedState);
+    var state = (isParsed ? state : JSON.parse(state));
 
     if (state) {
       // Resetting all fields
@@ -153,6 +170,15 @@
     }
   }
 
+  function saveDesign(designName) {
+    if (designName) {
+      console.log('Saving: ' + getSaveName(designName));
+      localStorage.setItem(getSaveName(designName), serializeCurrentState());
+      return true;
+    }
+    return false;
+  }
+
   function deleteDesign(designName) {
     if (designName) {
       localStorage.removeItem(getSaveName(designName));
@@ -208,12 +234,12 @@
   }
 
   function initializeSaveButton(designList) {
-    var saveButton = $('<button>Save New Design</button>').css(BUTTON_STYLE);
+    var saveButton = $('<button>Save Current Design</button>').css(BUTTON_STYLE);
     saveButton.click(function(ev) {
-      var designName = prompt("Enter a name for this design", (new Date()).toLocaleString());
-      if (designName) {
-        console.log('Saving: ' + getSaveName(designName));
-        localStorage.setItem(getSaveName(designName), serializeCurrentState());
+      var selectedDesign = $(designList).find(':selected').val();
+      var defaultName = selectedDesign || (new Date()).toLocaleString();
+      var designName = prompt('Name this design!', defaultName);
+      if (saveDesign(designName)) {
         addDesignListEntry(designList, designName);
       }
       return false;
@@ -221,15 +247,48 @@
     return saveButton;
   }
 
+  function initializeShareButton() {
+    var shareButton = $('<button>Share This Design</button>').css(BUTTON_STYLE);
+    shareButton.click(function(ev) {
+      ev.preventDefault();
+
+      var state = serializeCurrentState();
+
+      var shareLink = document.createElement('a');
+      shareLink.href = document.URL;
+      shareLink.hash = encodeURIComponent(state);
+
+      prompt("Share this link", shareLink.href);
+      return false;
+    });
+    return shareButton;
+  }
+
+  function init() {
+    var hashString = window.location.hash.replace(/^#/, '');
+    if (hashString.length > 0) {
+      console.log('Detected shared design. Attempting to load...');
+      var serializedState = decodeURIComponent(hashString);
+      var deserializedState = JSON.parse(serializedState);
+      if (deserializedState) {
+        restoreState(deserializedState, true);
+      }
+    }
+  }
+
   if (isRunnable()) {
     var designList = initializeDesignList('vss-designs');
     var deleteButton = initializeDeleteButton(designList);
     var saveButton = initializeSaveButton(designList);
+    var shareButton = initializeShareButton();
 
     $('.suit_selector .wrapper .total')
       .before(designList)
       .before(deleteButton)
-      .before(saveButton);
+      .before(saveButton)
+      .before(shareButton);
+
+    init();
   } else {
     alert('Vertical Suit Saver seems to be out-of-date. Womp womp.');
   }
