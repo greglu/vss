@@ -38,6 +38,23 @@
     return true;
   }
 
+  function isSmallDisplay() {
+    return $(window).outerWidth(true) < 768;
+  }
+
+  function styleButton(button) {
+    if (button) {
+      button.css(BUTTON_STYLE);
+      if (isSmallDisplay()) {
+        button.css({
+          'float': 'none',
+          'margin': '5px 5px 5px 0'
+        });
+      }
+    }
+    return button;
+  }
+
   function getDesignName(name) {
     if (name && name.indexOf(SAVE_PREFIX) === 0) {
       return name.substring(SAVE_PREFIX.length, name.length);
@@ -189,8 +206,11 @@
 
   function initializeDesignList(domIdName) {
     var designList = $('<select>Load Design</select>')
-      .attr('id', domIdName)
-      .css({'margin-left': '20px', 'float': 'left'});
+      .attr('id', domIdName);
+
+    if (!isSmallDisplay()) {
+      designList.css({'margin-left': '20px', 'float': 'left'});
+    }
 
     designList.append(
       $('<option>', { value: '', selected: 'selected' })
@@ -220,7 +240,7 @@
   }
 
   function initializeDeleteButton(designList) {
-    var deleteButton = $('<button>Delete Design</button>').css(BUTTON_STYLE);
+    var deleteButton = styleButton($('<button>Delete Design</button>'));
     deleteButton.click(function(ev) {
       var selectedDesign = designList.find(':selected').val();
       if (selectedDesign && confirm('Are you sure you want to delete: ' + selectedDesign)) {
@@ -234,7 +254,7 @@
   }
 
   function initializeSaveButton(designList) {
-    var saveButton = $('<button>Save Current Design</button>').css(BUTTON_STYLE);
+    var saveButton = styleButton($('<button>Save Current Design</button>'));
     saveButton.click(function(ev) {
       var selectedDesign = $(designList).find(':selected').val();
       var defaultName = selectedDesign || (new Date()).toLocaleString();
@@ -248,7 +268,7 @@
   }
 
   function initializeShareButton() {
-    var shareButton = $('<button>Share This Design</button>').css(BUTTON_STYLE);
+    var shareButton = styleButton($('<button>Share This Design</button>'));
     shareButton.click(function(ev) {
       ev.preventDefault();
       var state = serializeCurrentState();
