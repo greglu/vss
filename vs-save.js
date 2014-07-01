@@ -1,5 +1,5 @@
 (function() {
-  var SAVE_PREFIX = 'vss-' + $('#item_suitModel :selected').val() + '-';
+  var SAVE_PREFIX = 'vss-' + $('#item_suitModel :selected').val() + '::';
 
   var CONTAINER = $('#content');
 
@@ -251,14 +251,14 @@
     var shareButton = $('<button>Share This Design</button>').css(BUTTON_STYLE);
     shareButton.click(function(ev) {
       ev.preventDefault();
-
       var state = serializeCurrentState();
-
       var shareLink = document.createElement('a');
       shareLink.href = document.URL;
       shareLink.hash = encodeURIComponent(state);
 
-      prompt("Share this link", shareLink.href);
+      prompt("Copy the link below\n\nNOTE: all information entered gets shared!",
+        shareLink.href);
+
       return false;
     });
     return shareButton;
