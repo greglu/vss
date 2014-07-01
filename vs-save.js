@@ -42,6 +42,14 @@
     return SAVE_PREFIX + getDesignName(name);
   }
 
+  function triggerContainerEvent(target) {
+    if (target) {
+      var triggerEvent = $.Event('change');
+      triggerEvent.target = (target.jquery ? target[0] : target);
+      CONTAINER.trigger(triggerEvent);
+    }
+  }
+
   // ----- State saving/restoring ----- //
 
   function serializeCurrentState() {
@@ -83,14 +91,18 @@
 
     if (state) {
       // Resetting all fields
-      $.each(CONTAINER.find('input[type=text]'), function(k,v) {
+      $.each(CONTAINER.find('input[type=text],textarea'), function(k,v) {
         $(v).val('');
       });
       $.each(CONTAINER.find('input:checked'), function(k,v) {
         $(v).prop('checked', false);
       });
+      $.each(CONTAINER.find('select'), function(k,v) {
+        v.selectedIndex = 0;
+        triggerContainerEvent(v);
+      });
 
-      // Now restoring
+      // Now restoring all fields
       $.each(state.textItems, function(inputId, textValue) {
         $('#' + inputId).val(textValue);
       });
@@ -99,9 +111,7 @@
         var target = $('#' + inputId);
         if (target) {
           target.prop('checked', true);
-          var clickEvent = $.Event('change');
-          clickEvent.target = target[0];
-          CONTAINER.trigger(clickEvent);
+          triggerContainerEvent(target);
         }
       });
 
@@ -109,9 +119,7 @@
         var target = $('#' + selectId);
         if (target) {
           target.val(optionVal);
-          var clickEvent = $.Event('change');
-          clickEvent.target = target[0];
-          CONTAINER.trigger(clickEvent);
+          triggerContainerEvent(target);
         }
       });
 
@@ -165,7 +173,6 @@
 
     $.each(retrieveSavedDesigns(), function(k, v) {
       addDesignListEntry(designList, v);
-      // designList.append($('<option>', { value: v }).text(v));
     });
 
     designList.change(function(ev) {
