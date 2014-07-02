@@ -38,23 +38,6 @@
     return true;
   }
 
-  function isSmallDisplay() {
-    return $(window).outerWidth(true) < 768;
-  }
-
-  function styleButton(button) {
-    if (button) {
-      button.css(BUTTON_STYLE);
-      if (isSmallDisplay()) {
-        button.css({
-          'float': 'none',
-          'margin': '5px 5px 5px 0'
-        });
-      }
-    }
-    return button;
-  }
-
   function getDesignName(name) {
     if (name && name.indexOf(SAVE_PREFIX) === 0) {
       return name.substring(SAVE_PREFIX.length, name.length);
@@ -208,10 +191,6 @@
     var designList = $('<select>Load Design</select>')
       .attr('id', domIdName);
 
-    if (!isSmallDisplay()) {
-      designList.css({'margin-left': '20px', 'float': 'left'});
-    }
-
     designList.append(
       $('<option>', { value: '', selected: 'selected' })
         .text('-- Load Saved Design --')
@@ -240,7 +219,7 @@
   }
 
   function initializeDeleteButton(designList) {
-    var deleteButton = styleButton($('<button>Delete Design</button>'));
+    var deleteButton = $('<button>Delete</button>');
     deleteButton.click(function(ev) {
       var selectedDesign = designList.find(':selected').val();
       if (selectedDesign && confirm('Are you sure you want to delete: ' + selectedDesign)) {
@@ -254,7 +233,7 @@
   }
 
   function initializeSaveButton(designList) {
-    var saveButton = styleButton($('<button>Save Current Design</button>'));
+    var saveButton = $('<button>Save Current</button>');
     saveButton.click(function(ev) {
       var selectedDesign = $(designList).find(':selected').val();
       var defaultName = selectedDesign || (new Date()).toLocaleString();
@@ -268,7 +247,7 @@
   }
 
   function initializeShareButton() {
-    var shareButton = styleButton($('<button>Share This Design</button>'));
+    var shareButton = $('<button>Share</button>');
     shareButton.click(function(ev) {
       ev.preventDefault();
       var state = serializeCurrentState();
@@ -276,7 +255,8 @@
       shareLink.href = document.URL;
       shareLink.hash = encodeURIComponent(state);
 
-      prompt("Copy the link below\n\nNOTE: all information entered gets shared!",
+      prompt("Copy the link below, and share it with your friends. Make sure they're also running VSS.\n\n" +
+        "NOTE: all information entered gets shared, including contact information!",
         shareLink.href);
 
       return false;
@@ -294,6 +274,12 @@
         restoreState(deserializedState, true);
       }
     }
+
+    var styleSheet =document.createElement("link");
+    styleSheet.setAttribute("rel", "stylesheet");
+    styleSheet.setAttribute("type", "text/css");
+    styleSheet.setAttribute("href", 'http://localhost:8000/vss.css');
+    document.body.appendChild(styleSheet);
   }
 
   if (isRunnable()) {
@@ -302,11 +288,13 @@
     var saveButton = initializeSaveButton(designList);
     var shareButton = initializeShareButton();
 
-    $('.suit_selector .wrapper .total')
-      .before(designList)
-      .before(deleteButton)
-      .before(saveButton)
-      .before(shareButton);
+    var vssWrapper = $('<div id="vss" class="wrapper">')
+      .append(designList)
+      .append(deleteButton)
+      .append(saveButton)
+      .append(shareButton);
+
+    $('.suit_selector').append(vssWrapper);
 
     init();
   } else {

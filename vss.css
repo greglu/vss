@@ -1,0 +1,37 @@
+#vss {
+  margin-bottom: 10px;
+}
+
+#vss button {
+  vertical-align: top;
+  font-size: 22px;
+  margin: 0 10px 0 0;
+  /*min-width: 120px;*/
+  color: #fff;
+  background: #666;
+  border: none;
+  font-size: 17px;
+  margin-top: 1px;
+  /*width: auto;*/
+  /*float: left;*/
+  border-radius: 5px
+}
+
+@media screen and (min-width: 768px) {
+  #vss {
+    float: left;
+  }
+  #vss select {
+    margin: 0 10px 0 0;
+  }
+  #drawing {
+    top: 104px;
+  }
+  #content {
+    margin-top: 56px;
+  }
+  /*.suit_selector,
+  .suit_selector .wrapper p.total {
+    line-height: 32px;
+  }*/
+}
