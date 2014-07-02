@@ -6,30 +6,13 @@
   var CONTAINER_OPTIONS_SELECTOR = '#panel_options';
   var CONTAINER_OPTIONS = $(CONTAINER_OPTIONS_SELECTOR);
 
-  var BUTTON_STYLE = {
-    // copied from verticalsuits.css
-    "vertical-align": "top",
-    "font-size": "22px",
-    "margin": "0 0 0 10px",
-    "min-width": "120px",
-    "color": "#fff",
-    "background": "#666",
-    "border": "none",
-    "font-size": "17px",
-    "margin-top": "1px",
-    "width": "auto",
-    // custom styling
-    "float": "left",
-    "border-radius": "5px"
-  };
-
   // ----- Utilities ----- //
 
   function isRunnable() {
     if (!$) {
       return false;
     }
-    if (!('localStorage' in window && window['localStorage'] !== null)) {
+    if (!('localStorage' in window && window.localStorage !== null)) {
       return false;
     }
     if (CONTAINER.length === 0 || CONTAINER_OPTIONS.length === 0) {
@@ -104,7 +87,7 @@
       return;
     }
 
-    var state = (isParsed ? state : JSON.parse(state));
+    state = (isParsed ? state : JSON.parse(state));
 
     if (state) {
       // Resetting all fields

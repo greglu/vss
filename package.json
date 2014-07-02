@@ -1,0 +1,14 @@
+{
+  "name": "vss",
+  "version": "1.0.0",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/greglu/vss.git"
+  },
+  "devDependencies": {
+    "grunt": "~0.4.5",
+    "grunt-contrib-jshint": "~0.10.0",
+    "grunt-contrib-uglify": "~0.4.0",
+    "grunt-contrib-cssmin": "~0.10.0"
+  }
+}
