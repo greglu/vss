@@ -388,3 +388,7 @@ footer a:hover {
   border: 1px solid #000;
   margin: 12px 8px;
 }
+
+#questions dd {
+  margin-bottom: 10px;
+}
