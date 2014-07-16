@@ -1,4 +1,5 @@
 (function() {
+  var CSS_URL = 'https://greglu.github.io/vss/build/vss.min.css';
   var SAVE_PREFIX = 'vss-' + $('#item_suitModel :selected').val() + '::';
 
   var CONTAINER = $('#content');
@@ -261,7 +262,7 @@
     var styleSheet =document.createElement("link");
     styleSheet.setAttribute("rel", "stylesheet");
     styleSheet.setAttribute("type", "text/css");
-    styleSheet.setAttribute("href", 'http://localhost:8000/vss.css');
+    styleSheet.setAttribute("href", CSS_URL);
     document.body.appendChild(styleSheet);
   }
 
