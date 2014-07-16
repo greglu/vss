@@ -1,5 +1,5 @@
 (function() {
-  var CSS_URL = 'https://greglu.github.io/vss/build/vss.min.css';
+  var CSS_URL = 'https://greglu.github.io/vss/vss.min.css';
   var SAVE_PREFIX = 'vss-' + $('#item_suitModel :selected').val() + '::';
 
   var CONTAINER = $('#content');
