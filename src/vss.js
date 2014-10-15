@@ -7,7 +7,51 @@
   var CONTAINER_OPTIONS_SELECTOR = '#panel_options';
   var CONTAINER_OPTIONS = $(CONTAINER_OPTIONS_SELECTOR);
 
+  var VSS_DESIGNS_DOMID = 'vss-designs';
+
   // ----- Utilities ----- //
+
+  /**
+   * Adapted from paulund's jQuery modal box plugin
+   * Author: Paul Underwood
+   * URL: http://www.paulund.co.uk
+   * Available for free download from http://www.paulund.co.uk
+   */
+  function modalBox(prop) {
+    var options = $.extend({
+      title: "Share Your Design",
+      description: "",
+    }, prop);
+
+    function add_block_page() {
+      var block_page = $('<div class="paulund_block_page"></div>');
+      // Clicking outside the modal box will close it
+      block_page.click(function(ev) {
+        ev.stopImmediatePropagation();
+        $(this).fadeOut().remove();
+      });
+      block_page.appendTo('body');
+    }
+
+    function add_popup_box() {
+      var pop_up = $('<div class="paulund_modal_box"><a href="#" class="paulund_modal_close"></a><div class="paulund_inner_modal_box"><h2>' + options.title + '</h2><p>' + options.description + '</p></div></div>');
+      // Prevents clicks inside the modal box from closing it
+      pop_up.click(function(ev) {
+        ev.stopPropagation();
+      });
+      pop_up.appendTo('.paulund_block_page');
+
+      $('.paulund_modal_close').click(function() {
+        $(this).parent().fadeOut().remove();
+        $('.paulund_block_page').fadeOut().remove();
+      });
+    }
+
+    add_block_page();
+    add_popup_box();
+    $('.paulund_modal_box').fadeIn();
+    return this;
+  }
 
   function isRunnable() {
     if (!$) {
@@ -98,7 +142,8 @@
       $.each(CONTAINER.find('input:checked'), function(k,v) {
         $(v).prop('checked', false);
       });
-      $.each(CONTAINER.find('select'), function(k,v) {
+      // Skip the VSS design list, which is a select form
+      $.each(CONTAINER.find('select[id!=' + VSS_DESIGNS_DOMID + ']'), function(k,v) {
         v.selectedIndex = 0;
         triggerContainerEvent(v);
       });
@@ -217,7 +262,7 @@
   }
 
   function initializeSaveButton(designList) {
-    var saveButton = $('<button>Save Current</button>');
+    var saveButton = $('<button>Save Current Design</button>');
     saveButton.click(function(ev) {
       var selectedDesign = $(designList).find(':selected').val();
       var defaultName = selectedDesign || (new Date()).toLocaleString();
@@ -239,9 +284,11 @@
       shareLink.href = document.URL;
       shareLink.hash = encodeURIComponent(state);
 
-      prompt("Copy the link below, and share it with your friends. Make sure they're also running VSS.\n\n" +
-        "NOTE: all information entered gets shared, including contact information!",
-        shareLink.href);
+      var output = '<div>Copy the link below, and share it with your friends.</div>' +
+        '<div><strong>NOTE:</strong> all information entered gets shared, including contact information!</div>' +
+        '<div><input type="text" size="75" value="' + shareLink.href + '"></div>';
+
+      modalBox({ description: output });
 
       return false;
     });
@@ -251,34 +298,51 @@
   function init() {
     var hashString = window.location.hash.replace(/^#/, '');
     if (hashString.length > 0) {
-      console.log('Detected shared design. Attempting to load...');
       var serializedState = decodeURIComponent(hashString);
-      var deserializedState = JSON.parse(serializedState);
+
+      var deserializedState;
+      try {
+        deserializedState = JSON.parse(serializedState);
+      } catch (err) {
+      }
       if (deserializedState) {
+        console.log('Detected shared design. Attempting to load...');
         restoreState(deserializedState, true);
       }
     }
 
-    var styleSheet =document.createElement("link");
-    styleSheet.setAttribute("rel", "stylesheet");
-    styleSheet.setAttribute("type", "text/css");
-    styleSheet.setAttribute("href", CSS_URL);
-    document.body.appendChild(styleSheet);
+    // load the stylesheet if it hasn't been loaded yet
+    var alreadyLoaded = false;
+    $('link').each(function(k, link) {
+      var href = $(link).attr('href');
+      if (href.indexOf('vss.css') !== -1 || href.indexOf('vss.min.css') !== -1) {
+        alreadyLoaded = true;
+      }
+    });
+
+    if (!alreadyLoaded) {
+      var styleSheet = document.createElement("link");
+      styleSheet.setAttribute("rel", "stylesheet");
+      styleSheet.setAttribute("type", "text/css");
+      styleSheet.setAttribute("href", CSS_URL);
+      document.body.appendChild(styleSheet);
+    }
   }
 
   if (isRunnable()) {
-    var designList = initializeDesignList('vss-designs');
+    var designList = initializeDesignList(VSS_DESIGNS_DOMID);
     var deleteButton = initializeDeleteButton(designList);
     var saveButton = initializeSaveButton(designList);
     var shareButton = initializeShareButton();
 
-    var vssWrapper = $('<div id="vss" class="wrapper">')
-      .append(designList)
-      .append(deleteButton)
+    // This is where the ordering of the button happens
+    var vssWrapper = $('<div id="vss" class="form_submit clearfix">')
       .append(saveButton)
-      .append(shareButton);
+      .append(shareButton)
+      .append(designList)
+      .append(deleteButton);
 
-    $('.suit_selector').append(vssWrapper);
+    $('#content .form_submit').before(vssWrapper);
 
     init();
   } else {
