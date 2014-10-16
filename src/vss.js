@@ -1,4 +1,4 @@
-(function() {
+$(function() {
   var CSS_URL = 'http://vss.greg.lu/vss.min.css';
   var SAVE_PREFIX = 'vss-' + $('#item_suitModel :selected').val() + '::';
 
@@ -351,4 +351,4 @@
   } else {
     alert('Vertical Suit Saver seems to be out-of-date. Womp womp.');
   }
-})();
+});
