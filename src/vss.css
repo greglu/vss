@@ -46,6 +46,10 @@
   -webkit-border-radius: 10px;
 }
 
+.paulund_inner_modal_box div {
+  margin: 20px 0;
+}
+
 .paulund_block_page .paulund_modal_close {
   color: #777;
   font: 20px/100% arial, sans-serif;

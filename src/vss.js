@@ -4,6 +4,9 @@
 
   var CONTAINER = $('#content');
 
+  // panels that are eligible for saving to VSS
+  var SERIALIZABLE_CONTAINER = CONTAINER.find('#panel_options,#panel_measurements');
+
   var CONTAINER_OPTIONS_SELECTOR = '#panel_options';
   var CONTAINER_OPTIONS = $(CONTAINER_OPTIONS_SELECTOR);
 
@@ -34,7 +37,7 @@
     }
 
     function add_popup_box() {
-      var pop_up = $('<div class="paulund_modal_box"><a href="#" class="paulund_modal_close"></a><div class="paulund_inner_modal_box"><h2>' + options.title + '</h2><p>' + options.description + '</p></div></div>');
+      var pop_up = $('<div class="paulund_modal_box"><a href="#" class="paulund_modal_close"></a><div class="paulund_inner_modal_box"><h2>' + options.title + '</h2>' + options.description + '</div></div>');
       // Prevents clicks inside the modal box from closing it
       pop_up.click(function(ev) {
         ev.stopPropagation();
@@ -99,19 +102,19 @@
 
   function serializeCurrentState() {
     var checkedItems = [];
-    $.each(CONTAINER.find('input:checked'), function(k,v) {
+    $.each(SERIALIZABLE_CONTAINER.find('input:checked'), function(k,v) {
       checkedItems.push(v.id);
     });
 
     var textItems = {};
-    $.each(CONTAINER.find('input[type=text],textarea'), function(k,v) {
+    $.each(SERIALIZABLE_CONTAINER.find('input[type=text],textarea'), function(k,v) {
       if (v.value) {
         textItems[v.id] = v.value;
       }
     });
 
     var selectedOptionItems = {};
-    $.each(CONTAINER.find('select'), function(k,v) {
+    $.each(SERIALIZABLE_CONTAINER.find('select'), function(k,v) {
       var selectedVal = $(v).find('option:selected').val();
       if (selectedVal) {
         selectedOptionItems[v.id] = selectedVal;
@@ -136,14 +139,14 @@
 
     if (state) {
       // Resetting all fields
-      $.each(CONTAINER.find('input[type=text],textarea'), function(k,v) {
+      $.each(SERIALIZABLE_CONTAINER.find('input[type=text],textarea'), function(k,v) {
         $(v).val('');
       });
-      $.each(CONTAINER.find('input:checked'), function(k,v) {
+      $.each(SERIALIZABLE_CONTAINER.find('input:checked'), function(k,v) {
         $(v).prop('checked', false);
       });
       // Skip the VSS design list, which is a select form
-      $.each(CONTAINER.find('select[id!=' + VSS_DESIGNS_DOMID + ']'), function(k,v) {
+      $.each(SERIALIZABLE_CONTAINER.find('select[id!=' + VSS_DESIGNS_DOMID + ']'), function(k,v) {
         v.selectedIndex = 0;
         triggerContainerEvent(v);
       });
@@ -284,8 +287,8 @@
       shareLink.href = document.URL;
       shareLink.hash = encodeURIComponent(state);
 
-      var output = '<div>Copy the link below, and share it with your friends.</div>' +
-        '<div><strong>NOTE:</strong> all information entered gets shared, including contact information!</div>' +
+      var output = '<div>Copy the link below, and share it with your friends</div>' +
+        '<div><strong>NOTE:</strong> only suit options, and measurements are shared</div>' +
         '<div><input type="text" size="75" value="' + shareLink.href + '"></div>';
 
       modalBox({ description: output });
