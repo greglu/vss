@@ -1,10 +1,55 @@
 #vss {
-  padding: 5px 10px;
-  text-align: right;
+  padding: 5px 0;
+  font-size: 16px;
+  margin: 0 0 10px;
+}
+
+@media screen and (min-width: 768px) {
+  #vss {
+    position: fixed;
+    top: 47px;
+    right: 0;
+    left: 0;
+    width: 100%;
+  }
+
+  #drawing {
+    top: 88px;
+  }
+
+  #content {
+    margin-top: 40px;
+  }
+}
+
+#vss .wrapper {
+  margin-left: 2%;
+  width: 96%;
+}
+
+#vss .vss-section {
+  margin-right: 30px;
+  display: inline-block;
+}
+
+#vss .vss-section.share img {
+  vertical-align: text-top;
+  margin: 0 5px;
+  cursor: pointer;
+}
+
+#vss a {
+  color: #000;
+  text-decoration: none;
+}
+
+#vss a:hover {
+  text-decoration: underline
 }
 
 #vss select {
-  margin: 1px 0 0 10px;
+  margin: 0 0 0 10px;
+  vertical-align: text-bottom;
 }
 
 .paulund_modal_box {

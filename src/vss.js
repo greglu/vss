@@ -217,15 +217,93 @@ $(function() {
     }
   }
 
+  // ----- Social Sharing ----- //
+
+  function generateShareLink() {
+      var state = serializeCurrentState();
+      var shareLink = document.createElement('a');
+      shareLink.href = document.URL;
+      shareLink.hash = encodeURIComponent(state);
+      return shareLink.href;
+  }
+
+  function getShortenedUrl(longUrl, cb) {
+    $.ajax({
+      type: 'POST',
+      dataType: 'json',
+      contentType: 'application/json; charset=utf-8',
+      url: 'https://www.googleapis.com/urlshortener/v1/url',
+      data: JSON.stringify({ longUrl: longUrl }),
+      success: function(response)
+      {
+        cb(response.id);
+      },
+    });
+  }
+
+  function navigateToLink(url) {
+    // Using this method since window.open will trigger pop-up blockers
+    var a = document.createElement('a');
+    if (!a.click) {
+      // for IE
+      window.location = url;
+      return;
+    }
+    a.setAttribute('href', url);
+    a.style.display = 'none';
+    document.body.appendChild(a);
+    a.click();
+  }
+
+  function shareFacebook() {
+    getShortenedUrl(generateShareLink(), function(shortenedUrl) {
+      navigateToLink('https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(shortenedUrl));
+    });
+    return false;
+  }
+
+  function shareTwitter() {
+    getShortenedUrl(generateShareLink(), function(shortenedUrl) {
+      navigateToLink('http://twitter.com/home?status=' + encodeURIComponent('Check out my Vertical Suit design! ' + shortenedUrl));
+    });
+    return false;
+  }
+
+  function shareGooglePlus() {
+    getShortenedUrl(generateShareLink(), function(shortenedUrl) {
+      navigateToLink('https://plus.google.com/share?url=' + encodeURIComponent(shortenedUrl));
+    });
+    return false;
+  }
+
+  function sharePinterest() {
+    getShortenedUrl(generateShareLink(), function(shortenedUrl) {
+      var description = encodeURIComponent('Check out my Vertical Suit design!');
+      navigateToLink('http://www.pinterest.com/pin/create/button/?description=' + description + '&url=' + encodeURIComponent(shortenedUrl));
+    });
+    return false;
+  }
+
+  function shareEmail() {
+    getShortenedUrl(generateShareLink(), function(shortenedUrl) {
+      var subject = encodeURIComponent('Check out my Vertical Suit design!');
+      navigateToLink('mailto:?subject=' + subject + '&body=' + encodeURIComponent(shortenedUrl));
+    });
+    return false;
+  }
+
   // ----- Main controls ----- //
 
+  function wrapElement(el, name) {
+    return $('<div class="vss-section ' + name + '">').append(el);
+  }
+
   function initializeDesignList(domIdName) {
-    var designList = $('<select>Load Design</select>')
+    var designList = $('<select>Load Saved Design</select>')
       .attr('id', domIdName);
 
     designList.append(
-      $('<option>', { value: '', selected: 'selected' })
-        .text('-- Load Saved Design --')
+      $('<option>', { value: '', selected: 'selected' }).text('')
     );
 
     $.each(retrieveSavedDesigns(), function(k, v) {
@@ -241,7 +319,8 @@ $(function() {
       return false;
     });
 
-    return designList;
+    return wrapElement(designList, 'load')
+      .prepend('<span>Load Saved Design</span>');
   }
 
   function addDesignListEntry(designList, designName) {
@@ -250,8 +329,8 @@ $(function() {
     }
   }
 
-  function initializeDeleteButton(designList) {
-    var deleteButton = $('<button>Delete</button>');
+  function initializeDelete(designList) {
+    var deleteButton = $('<a href="#">Delete</a>');
     deleteButton.click(function(ev) {
       var selectedDesign = designList.find(':selected').val();
       if (selectedDesign && confirm('Are you sure you want to delete: ' + selectedDesign)) {
@@ -261,11 +340,11 @@ $(function() {
       }
       return false;
     });
-    return deleteButton;
+    return wrapElement(deleteButton, 'delete');
   }
 
-  function initializeSaveButton(designList) {
-    var saveButton = $('<button>Save Current Design</button>');
+  function initializeSave(designList) {
+    var saveButton = $('<a href="#">Save this Design</a>');
     saveButton.click(function(ev) {
       var selectedDesign = $(designList).find(':selected').val();
       var defaultName = selectedDesign || (new Date()).toLocaleString();
@@ -275,27 +354,47 @@ $(function() {
       }
       return false;
     });
-    return saveButton;
+    return wrapElement(saveButton, 'save');
   }
 
-  function initializeShareButton() {
-    var shareButton = $('<button>Share</button>');
+  function initializeShare() {
+    var shareButton = $('<a href="#">Share</a>');
     shareButton.click(function(ev) {
       ev.preventDefault();
-      var state = serializeCurrentState();
-      var shareLink = document.createElement('a');
-      shareLink.href = document.URL;
-      shareLink.hash = encodeURIComponent(state);
+      var shareLink = generateShareLink();
 
       var output = '<div>Copy the link below, and share it with your friends</div>' +
         '<div><strong>NOTE:</strong> only suit options, and measurements are shared</div>' +
-        '<div><input type="text" size="75" value="' + shareLink.href + '"></div>';
+        '<div><input type="text" size="75" value="' + shareLink + '"></div>';
 
       modalBox({ description: output });
 
       return false;
     });
-    return shareButton;
+
+    var shareElement = wrapElement(shareButton, 'share');
+
+    var facebookButton = $('<img src="http://localhost:8000/facebook.png" alt="Share on Facebook" />');
+    facebookButton.click(shareFacebook);
+    shareElement.append(facebookButton);
+
+    var twitterButton = $('<img src="http://localhost:8000/twitter.png" alt="Share on Twitter" />');
+    twitterButton.click(shareTwitter);
+    shareElement.append(twitterButton);
+
+    var googlePlusButton = $('<img src="http://localhost:8000/gplus.png" alt="Share on Google+" />');
+    googlePlusButton.click(shareGooglePlus);
+    shareElement.append(googlePlusButton);
+
+    var pinterestButton = $('<img src="http://localhost:8000/pinterest.png" alt="Share on Pinterest" />');
+    pinterestButton.click(sharePinterest);
+    shareElement.append(pinterestButton);
+
+    var emailButton = $('<img src="http://localhost:8000/email.png" alt="Share by E-Mail" />');
+    emailButton.click(shareEmail);
+    shareElement.append(emailButton);
+
+    return shareElement;
   }
 
   function init() {
@@ -334,18 +433,19 @@ $(function() {
 
   if (isRunnable()) {
     var designList = initializeDesignList(VSS_DESIGNS_DOMID);
-    var deleteButton = initializeDeleteButton(designList);
-    var saveButton = initializeSaveButton(designList);
-    var shareButton = initializeShareButton();
+    var deleteButton = initializeDelete(designList);
+    var saveButton = initializeSave(designList);
+    var shareButton = initializeShare();
 
-    // This is where the ordering of the button happens
-    var vssWrapper = $('<div id="vss" class="form_submit clearfix">')
+    // This is where the ordering of the sections happens
+    var vss = $('<div id="vss" class="form_submit clearfix">').append('<div class="wrapper">');
+    vss.find('.wrapper')
       .append(saveButton)
-      .append(shareButton)
       .append(designList)
-      .append(deleteButton);
+      .append(deleteButton)
+      .append(shareButton);
 
-    $('#content .form_submit').before(vssWrapper);
+    $('.suit_selector').after(vss);
 
     init();
   } else {
