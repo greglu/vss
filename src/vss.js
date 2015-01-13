@@ -1,5 +1,7 @@
 $(function() {
-  var CSS_URL = 'http://vss.greg.lu/vss.min.css';
+  var CSS_URL = 'http://localhost:8000/vss.css';
+  var IMAGE_BUTTON_PATH = 'http://localhost:8000/';
+
   var SAVE_PREFIX = 'vss-' + $('#item_suitModel :selected').val() + '::';
 
   var CONTAINER = $('#content');
@@ -361,36 +363,37 @@ $(function() {
     var shareButton = $('<a href="#">Share</a>');
     shareButton.click(function(ev) {
       ev.preventDefault();
-      var shareLink = generateShareLink();
 
-      var output = '<div>Copy the link below, and share it with your friends</div>' +
-        '<div><strong>NOTE:</strong> only suit options, and measurements are shared</div>' +
-        '<div><input type="text" size="75" value="' + shareLink + '"></div>';
+      getShortenedUrl(generateShareLink(), function(shortenedUrl) {
+        var output = '<div>Copy the link below, and share it with your friends</div>' +
+          '<div><strong>NOTE:</strong> only suit options, and measurements are shared</div>' +
+          '<div><input type="text" size="75" value="' + shortenedUrl + '"></div>';
 
-      modalBox({ description: output });
+        modalBox({ description: output });
+      });
 
       return false;
     });
 
     var shareElement = wrapElement(shareButton, 'share');
 
-    var facebookButton = $('<img src="http://localhost:8000/facebook.png" alt="Share on Facebook" />');
+    var facebookButton = $('<img src="' + IMAGE_BUTTON_PATH + '/facebook.png" alt="Share on Facebook" />');
     facebookButton.click(shareFacebook);
     shareElement.append(facebookButton);
 
-    var twitterButton = $('<img src="http://localhost:8000/twitter.png" alt="Share on Twitter" />');
+    var twitterButton = $('<img src="' + IMAGE_BUTTON_PATH + '/twitter.png" alt="Share on Twitter" />');
     twitterButton.click(shareTwitter);
     shareElement.append(twitterButton);
 
-    var googlePlusButton = $('<img src="http://localhost:8000/gplus.png" alt="Share on Google+" />');
+    var googlePlusButton = $('<img src="' + IMAGE_BUTTON_PATH + '/gplus.png" alt="Share on Google+" />');
     googlePlusButton.click(shareGooglePlus);
     shareElement.append(googlePlusButton);
 
-    var pinterestButton = $('<img src="http://localhost:8000/pinterest.png" alt="Share on Pinterest" />');
+    var pinterestButton = $('<img src="' + IMAGE_BUTTON_PATH + '/pinterest.png" alt="Share on Pinterest" />');
     pinterestButton.click(sharePinterest);
     shareElement.append(pinterestButton);
 
-    var emailButton = $('<img src="http://localhost:8000/email.png" alt="Share by E-Mail" />');
+    var emailButton = $('<img src="' + IMAGE_BUTTON_PATH + '/email.png" alt="Share by E-Mail" />');
     emailButton.click(shareEmail);
     shareElement.append(emailButton);
 
