@@ -330,7 +330,7 @@ $(function() {
       return false;
     });
 
-    return wrapElement(designList, 'load').prepend('<span>Load Saved Design</span>');;
+    return wrapElement(designList, 'load').prepend('<span>Load Saved Design</span>');
   }
 
   function addDesignListEntry(designList, designName) {
