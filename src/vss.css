@@ -52,12 +52,17 @@
   vertical-align: text-bottom;
 }
 
+#vss .vss_tip_toggle {
+  margin-left: 5px;
+  cursor: pointer;
+}
+
 .paulund_modal_box {
   position: absolute;
   left: 30%;
   top: 30%;
   display: none;
-  height: 200px;
+  height: 250px;
   width: 500px;
   border:1px solid #fff;
   box-shadow: 0px 2px 7px #292929;
@@ -82,7 +87,7 @@
 
 .paulund_inner_modal_box {
   background-color: #fff;
-  height: 150px;
+  height: 200px;
   width: 450px;
   padding: 10px;
   margin: 15px;

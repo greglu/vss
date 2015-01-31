@@ -33,7 +33,7 @@ $(function() {
       // Clicking outside the modal box will close it
       block_page.click(function(ev) {
         ev.stopImmediatePropagation();
-        $(this).fadeOut().remove();
+        close_popup_box();
       });
       block_page.appendTo('body');
     }
@@ -46,15 +46,24 @@ $(function() {
       });
       pop_up.appendTo('.paulund_block_page');
 
-      $('.paulund_modal_close').click(function() {
-        $(this).parent().fadeOut().remove();
-        $('.paulund_block_page').fadeOut().remove();
-      });
+      $('.paulund_modal_close').click(close_popup_box);
+    }
+
+    function close_popup_box() {
+      $('.paulund_modal_box').fadeOut().remove();
+      $('.paulund_block_page').fadeOut().remove();
     }
 
     add_block_page();
     add_popup_box();
     $('.paulund_modal_box').fadeIn();
+
+    $('body').one('keyup', function(e) {
+      if (e.which == 27) {
+        close_popup_box();
+      }
+    });
+
     return this;
   }
 
@@ -321,13 +330,16 @@ $(function() {
       return false;
     });
 
-    return wrapElement(designList, 'load')
-      .prepend('<span>Load Saved Design</span>');
+    return wrapElement(designList, 'load').prepend('<span>Load Saved Design</span>');;
   }
 
   function addDesignListEntry(designList, designName) {
     if (designName) {
-      designList.append($('<option>', { value: designName }).text(designName));
+      var selectElement = designList.find('select');
+      if (selectElement.length === 0) {
+        selectElement = designList;
+      }
+      selectElement.append($('<option>', { value: designName }).text(designName));
     }
   }
 
@@ -356,7 +368,21 @@ $(function() {
       }
       return false;
     });
-    return wrapElement(saveButton, 'save');
+
+    var toolTip = $('<img class="vss_tip_toggle" width="14" alt="VSS tool tip" src="img/Tango-icon-tip.png">');
+    toolTip.click(function(ev) {
+      var output = '<div>You can save multiple designs. You will need to use the same browser to access them later, or else you need to use the share functions to get a link for later access. Saving function only saves the information contained in suit options and measurements, your contact and billing info will not be saved nor shared so you can safely share your designs on social media sites.</div>' +
+          '<div><strong>NOTE:</strong> Vertical Suits cannot access any of your saved designs unless you share them with us or submit your order.</div>';
+
+      modalBox({ title: 'Save this Design', description: output });
+
+      return false;
+    });
+
+    var saveElement = wrapElement(saveButton, 'save');
+    saveElement.append(toolTip);
+
+    return saveElement;
   }
 
   function initializeShare() {
