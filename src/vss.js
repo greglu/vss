@@ -290,7 +290,9 @@ $(function() {
   function sharePinterest() {
     getShortenedUrl(generateShareLink(), function(shortenedUrl) {
       var description = encodeURIComponent('Check out my Vertical Suit design!');
-      navigateToLink('http://www.pinterest.com/pin/create/button/?description=' + description + '&url=' + encodeURIComponent(shortenedUrl));
+      navigateToLink('http://www.pinterest.com/pin/create/button/?description=' + description +
+        '&url=' + encodeURIComponent(shortenedUrl) +
+        '&media=' + encodeURIComponent('https://www.verticalsuits.com/order/img/vertical-designer.png'));
     });
     return false;
   }
