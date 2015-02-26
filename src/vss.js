@@ -287,16 +287,6 @@ $(function() {
     return false;
   }
 
-  function sharePinterest() {
-    getShortenedUrl(generateShareLink(), function(shortenedUrl) {
-      var description = encodeURIComponent('Check out my Vertical Suit design!');
-      navigateToLink('http://www.pinterest.com/pin/create/button/?description=' + description +
-        '&url=' + encodeURIComponent(shortenedUrl) +
-        '&media=' + encodeURIComponent('https://www.verticalsuits.com/order/img/vertical-designer.png'));
-    });
-    return false;
-  }
-
   function shareEmail() {
     getShortenedUrl(generateShareLink(), function(shortenedUrl) {
       var subject = encodeURIComponent('Check out my Vertical Suit design!');
@@ -416,10 +406,6 @@ $(function() {
     var googlePlusButton = $('<img src="' + IMAGE_BUTTON_PATH + '/gplus.png" alt="Share on Google+" />');
     googlePlusButton.click(shareGooglePlus);
     shareElement.append(googlePlusButton);
-
-    var pinterestButton = $('<img src="' + IMAGE_BUTTON_PATH + '/pinterest.png" alt="Share on Pinterest" />');
-    pinterestButton.click(sharePinterest);
-    shareElement.append(pinterestButton);
 
     var emailButton = $('<img src="' + IMAGE_BUTTON_PATH + '/email.png" alt="Share by E-Mail" />');
     emailButton.click(shareEmail);
